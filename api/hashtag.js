@@ -47,6 +47,11 @@ const getMessagesByHashTagQuery = function(hashtag) {
 		values: [hashtag]
 	}
 };
+const getLatestMessagesQuery = function() {
+	return {
+		sql : "SELECT * FROM messages m ORDER BY m.messageID DESC LIMIT 10"
+	};
+};
 const savePost = function (hres, message, user) {
 	Promise.using (db(), function(connection) {
 		return Promise.all([
@@ -79,9 +84,20 @@ const getMessagesByHashTag = function(hres, hashtag) {
 		hres.end(response.dbError);
 	});
 };
-
+const getLatestMessages = function(hres) {
+	console.log("maama");
+	Promise.using(db(), function(connection) {
+		return connection.queryAsync(getLatestMessagesQuery());
+	}).then (function(res) {
+		console.log(res);
+		hres.end(JSON.stringify(res));
+	}).catch(function(err) {
+		hres.end(response.dbError);
+	});
+}
 module.exports = {
 	getMessagesByUser : getMessagesByUser,
 	getMessagesByHashTag : getMessagesByHashTag,
+	getLatestMessages : getLatestMessages,
 	savePost : savePost
 }
